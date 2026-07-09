@@ -59,6 +59,17 @@ page = st.sidebar.radio(
     ]
 )
 
+page = st.sidebar.radio(
+    "Go to:",
+    [
+        "Test Case Generator",
+        "Script Generator",
+        "Log Analyzer",
+        "Regression Optimizer",
+        "QA Documentation RAG"
+    ]
+)
+
 
 # -----------------------------
 # Test Case Generator Page
@@ -220,3 +231,54 @@ elif page == "Regression Optimizer":
 
             st.write("### Summary")
             st.write(recommendation.summary)
+
+
+
+# -----------------------------
+# RAG Documentation Page
+# -----------------------------
+
+elif page == "QA Documentation RAG":
+    st.header("📚 QA Documentation RAG Assistant")
+
+    st.write(
+        "Ask questions about QA standards, automation rules, regression governance, "
+        "or any internal documentation indexed by the RAG engine."
+    )
+
+    query = st.text_area(
+        "Enter your question:",
+        height=150,
+        placeholder="Example: What are the mandatory fields for a test case?"
+    )
+
+    docs_path = st.text_input(
+        "Documentation folder:",
+        value="docs/qa/",
+        help="Folder containing QA documentation files (.md) used by the RAG engine."
+    )
+
+    if st.button("Ask RAG"):
+        if not query.strip():
+            st.error("Please enter a question.")
+        else:
+            try:
+                from modules.rag_docs.rag_docs import QARAGEngine
+
+                rag = QARAGEngine(docs_path=docs_path)
+                answer = rag.answer(query)
+                retrieved_chunks = rag.retrieve(query)
+
+                st.success("RAG answer generated successfully!")
+
+                st.subheader("📘 Answer")
+                st.write(answer)
+
+                st.subheader("📄 Retrieved Documentation Chunks")
+                for i, chunk in enumerate(retrieved_chunks, start=1):
+                    st.markdown(f"**Chunk {i}:**")
+                    st.write(chunk)
+                    st.markdown("---")
+
+            except Exception as e:
+                st.error(f"Error running RAG engine: {e}")
