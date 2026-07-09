@@ -1,47 +1,50 @@
 """
-AI-Assisted Test Case Generator (with RAG Integration)
-------------------------------------------------------
+Security RAG Integration — Test Case Generator Enhancement
+----------------------------------------------------------
 
-This module provides a functional implementation of an AI-powered
-test case generator. It takes raw requirements as input and produces
-structured test cases using an LLM backend.
+This integration extends the Test Case Generator with security-aware context
+using a Retrieval-Augmented Generation (RAG) engine. The generator now retrieves
+relevant security documentation (AppSec standards, API security rules, secure
+coding guidelines, secrets management policies, IAM governance, SAST/DAST
+standards, and more) and injects that knowledge directly into the LLM prompt.
 
-Now enhanced with RAG (Retrieval-Augmented Generation), the generator
-retrieves relevant QA documentation and injects it into the prompt,
-ensuring that generated test cases follow internal QA standards.
+What this integration provides
+------------------------------
+By combining raw requirements with security documentation, the Test Case
+Generator becomes capable of:
 
-Extended Description
---------------------
-This module performs the following functions:
+1. Producing test cases that include security validations.
+2. Detecting missing security requirements such as:
+   - authentication
+   - authorization
+   - rate limiting
+   - secrets protection
+   - secure input handling
+3. Generating additional security-focused test cases.
+4. Aligning test cases with AppSec and DevSecOps standards.
 
-- Reads raw requirements provided as plain text.
-- Retrieves relevant QA documentation using the RAG engine.
-- Builds an optimized prompt combining requirements + documentation.
-- Sends the prompt to an LLM backend (OpenAI) to generate structured test cases.
-- Returns test cases in JSON format.
-- Converts JSON output into Python objects using the TestCase dataclass.
-- Includes an executable example.
-- Fully functional: requires OPENAI_API_KEY.
+Example
+-------
+Given requirements involving user login or API calls, the generator can now:
+- add test cases validating token expiration
+- add test cases validating RBAC enforcement
+- add negative tests for invalid payloads
+- add tests validating secure error messages
 
-Author: AI-Assisted QA Lead (in transition)
+This results in more complete and security-aligned test coverage.
 """
 
 import os
-from typing import List
 from dataclasses import dataclass
+from typing import List
 
 try:
     from openai import OpenAI
 except ImportError:
     raise ImportError("Install with: pip install openai")
 
-# Import RAG engine
 from modules.rag_docs.rag_docs import QARAGEngine
 
-
-# -----------------------------
-# Data Models
-# -----------------------------
 
 @dataclass
 class TestCase:
@@ -51,16 +54,11 @@ class TestCase:
     expected_result: str
 
 
-# -----------------------------
-# LLM Client Wrapper
-# -----------------------------
-
 class LLMClient:
     def __init__(self, model: str = "gpt-4o-mini"):
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
-            raise ValueError("Environment variable OPENAI_API_KEY is missing.")
-
+            raise ValueError("OPENAI_API_KEY missing.")
         self.client = OpenAI(api_key=api_key)
         self.model = model
 
@@ -73,97 +71,57 @@ class LLMClient:
         return response.choices[0].message.content
 
 
-# -----------------------------
-# Test Case Generator (with RAG)
-# -----------------------------
-
 class TestCaseGenerator:
     """
-    Generates structured test cases from raw requirements using an LLM,
-    enhanced with RAG-based QA documentation retrieval.
+    Generates test cases using LLM + Security RAG context.
     """
 
-    def __init__(self, model: str = "gpt-4o-mini", docs_path: str = "docs/qa/"):
+    def __init__(self, model: str = "gpt-4o-mini", security_docs_path: str = "docs/security/"):
         self.llm = LLMClient(model=model)
-        self.rag = QARAGEngine(docs_path=docs_path)
+        self.rag = QARAGEngine(docs_path=security_docs_path)
 
     def generate_testcases(self, requirements: str) -> List[TestCase]:
-        # Retrieve relevant QA documentation
-        retrieved_docs = self.rag.retrieve(requirements)
+        security_chunks = self.rag.retrieve(requirements)
 
-        # Build prompt with documentation context
-        prompt = self._build_prompt(requirements, retrieved_docs)
-
+        prompt = self._build_prompt(requirements, security_chunks)
         raw_output = self.llm.generate(prompt)
+
         return self._parse_output(raw_output)
 
-    def _build_prompt(self, requirements: str, docs: List[str]) -> str:
-        docs_context = "\n\n".join(docs)
+    def _build_prompt(self, requirements: str, security_docs: List[str]) -> str:
+        docs_block = "\n\n".join(security_docs)
 
         return f"""
-You are an expert QA engineer. Use the following QA documentation to guide your test case creation:
+You are an expert QA + Security engineer.
 
---- QA Documentation Context ---
-{docs_context}
---------------------------------
+Use the following Security documentation to guide test case creation:
+
+--- Security Documentation Context ---
+{docs_block}
+-------------------------------------
 
 Convert the following requirements into structured test cases.
 
-Use this JSON format:
-
-[
-  {{
-    "id": "TC-001",
-    "title": "Short descriptive title",
-    "steps": ["Step 1", "Step 2", ...],
-    "expected_result": "Expected outcome"
-  }}
-]
-
 Requirements:
 {requirements}
+
+Return JSON with:
+- id
+- title
+- steps
+- expected_result
 """
 
     def _parse_output(self, raw_output: str) -> List[TestCase]:
         import json
+        data = json.loads(raw_output)
 
-        try:
-            data = json.loads(raw_output)
-        except json.JSONDecodeError:
-            raise ValueError("LLM returned invalid JSON. Raw output:\n" + raw_output)
-
-        testcases = []
-        for item in data:
-            tc = TestCase(
+        return [
+            TestCase(
                 id=item.get("id", "TC-UNKNOWN"),
                 title=item.get("title", "Untitled"),
                 steps=item.get("steps", []),
-                expected_result=item.get("expected_result", ""),
+                expected_result=item.get("expected_result", "")
             )
-            testcases.append(tc)
-
-        return testcases
-
-
-# -----------------------------
-# Example Usage
-# -----------------------------
-
-if __name__ == "__main__":
-    generator = TestCaseGenerator(docs_path="docs/qa/")
-
-    requirements_text = """
-    Users must be able to reset their password using email verification.
-    """
-
-    testcases = generator.generate_testcases(requirements_text)
-
-    print("\nGenerated Test Cases:\n")
-    for tc in testcases:
-        print(f"ID: {tc.id}")
-        print(f"Title: {tc.title}")
-        print("Steps:")
-        for step in tc.steps:
-            print(f"  - {step}")
-        print(f"Expected Result: {tc.expected_result}")
-        print("-" * 40)
+            for item in data
+        ]
