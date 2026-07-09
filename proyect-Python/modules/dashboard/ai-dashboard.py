@@ -49,26 +49,6 @@ st.write("A unified interface for AI-powered Quality Assurance modules.")
 # -----------------------------
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio(
-    "Go to:",
-    [
-        "Test Case Generator",
-        "Script Generator",
-        "Log Analyzer",
-        "Regression Optimizer",
-    ]
-)
-
-page = st.sidebar.radio(
-    "Go to:",
-    [
-        "Test Case Generator",
-        "Script Generator",
-        "Log Analyzer",
-        "Regression Optimizer",
-        "QA Documentation RAG"
-    ]
-)
 
 page = st.sidebar.radio(
     "Go to:",
@@ -78,9 +58,11 @@ page = st.sidebar.radio(
         "Log Analyzer",
         "Regression Optimizer",
         "QA Documentation RAG",
-        "Security Documentation RAG"
+        "Security Documentation RAG",
+        "DevOps Documentation RAG"
     ]
 )
+
 
 
 # -----------------------------
@@ -345,4 +327,52 @@ elif page == "Security Documentation RAG":
                 st.error(f"Error running Security RAG engine: {e}")
 
 
+# -----------------------------
+# DevOps Documentation RAG Page
+# -----------------------------
+
+elif page == "DevOps Documentation RAG":
+    st.header("⚙️ DevOps Documentation RAG Assistant")
+
+    st.write(
+        "Ask questions about CI/CD, containers, Kubernetes, observability, deployment strategies, "
+        "SRE, security pipelines, GitOps, load testing, incident response, and more."
+    )
+
+    query = st.text_area(
+        "Enter your DevOps-related question:",
+        height=150,
+        placeholder="Example: What checks must QA validate in a Kubernetes deployment?"
+    )
+
+    devops_docs_path = st.text_input(
+        "DevOps documentation folder:",
+        value="docs/devops/",
+        help="Folder containing DevOps documentation files (.md) used by the RAG engine."
+    )
+
+    if st.button("Ask DevOps RAG"):
+        if not query.strip():
+            st.error("Please enter a question.")
+        else:
+            try:
+                from modules.rag_docs.rag_docs import QARAGEngine
+
+                rag = QARAGEngine(docs_path=devops_docs_path)
+                answer = rag.answer(query)
+                retrieved_chunks = rag.retrieve(query)
+
+                st.success("DevOps RAG answer generated successfully!")
+
+                st.subheader("⚙️ Answer")
+                st.write(answer)
+
+                st.subheader("📄 Retrieved DevOps Documentation Chunks")
+                for i, chunk in enumerate(retrieved_chunks, start=1):
+                    st.markdown(f"**Chunk {i}:**")
+                    st.write(chunk)
+                    st.markdown("---")
+
+            except Exception as e:
+                st.error(f"Error running DevOps RAG engine: {e}")
 
