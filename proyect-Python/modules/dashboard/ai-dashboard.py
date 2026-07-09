@@ -70,6 +70,18 @@ page = st.sidebar.radio(
     ]
 )
 
+page = st.sidebar.radio(
+    "Go to:",
+    [
+        "Test Case Generator",
+        "Script Generator",
+        "Log Analyzer",
+        "Regression Optimizer",
+        "QA Documentation RAG",
+        "Security Documentation RAG"
+    ]
+)
+
 
 # -----------------------------
 # Test Case Generator Page
@@ -282,3 +294,55 @@ elif page == "QA Documentation RAG":
 
             except Exception as e:
                 st.error(f"Error running RAG engine: {e}")
+
+# -----------------------------
+# Security Documentation RAG Page
+# -----------------------------
+
+elif page == "Security Documentation RAG":
+    st.header("🔐 Security Documentation RAG Assistant")
+
+    st.write(
+        "Ask questions about AppSec, DevSecOps, threat modeling, secure coding, "
+        "secrets management, SBOM, SAST/DAST, IAM, API security, and more."
+    )
+
+    query = st.text_area(
+        "Enter your security-related question:",
+        height=150,
+        placeholder="Example: What are the mandatory controls for API security?"
+    )
+
+    security_docs_path = st.text_input(
+        "Security documentation folder:",
+        value="docs/security/",
+        help="Folder containing security documentation files (.md) used by the RAG engine."
+    )
+
+    if st.button("Ask Security RAG"):
+        if not query.strip():
+            st.error("Please enter a question.")
+        else:
+            try:
+                from modules.rag_docs.rag_docs import QARAGEngine
+
+                rag = QARAGEngine(docs_path=security_docs_path)
+                answer = rag.answer(query)
+                retrieved_chunks = rag.retrieve(query)
+
+                st.success("Security RAG answer generated successfully!")
+
+                st.subheader("🔐 Answer")
+                st.write(answer)
+
+                st.subheader("📄 Retrieved Security Documentation Chunks")
+                for i, chunk in enumerate(retrieved_chunks, start=1):
+                    st.markdown(f"**Chunk {i}:**")
+                    st.write(chunk)
+                    st.markdown("---")
+
+            except Exception as e:
+                st.error(f"Error running Security RAG engine: {e}")
+
+
+
