@@ -1,7 +1,7 @@
 # 🎯 AI-Assisted-QA-Toolkit
 
 A practical, modular toolkit for integrating **Generative AI** into **Quality Assurance** workflows.  
-This repository is part of a professional transition from *QA Lead Automation* to *AI‑Assisted QA Lead*, showcasing real tools, frameworks, and examples that demonstrate how AI can enhance QA productivity and effectiveness.
+This repository is part of a professional transition from *QA Lead Automation* to *AI‑Assisted QA Lead*, showcasing real tools, frameworks, and examples that demonstrate how AI can enhance QA produc[...] 
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -33,25 +33,26 @@ This repository is part of a professional transition from *QA Lead Automation* t
 
 ## 📁 Repository Structure
 
-```
+Below is an updated, clearer view of the repository layout reflecting the current project organization. Paths are relative to the repository root.
+
 AI-Assisted-QA-Toolkit/
 │
 ├── 📄 README.md                    # This file
 ├── 📄 LICENSE.md                   # MIT License
-├── 📄 CODE_OF_CONDUCT.md          # Community guidelines
-├── 📄 CONTRIBUTING.md             # Contribution guidelines
-├── 📄 .gitignore                  # Git ignore rules
+├── 📄 CODE_OF_CONDUCT.md           # Community guidelines
+├── 📄 CONTRIBUTING.md              # Contribution guidelines
+├── 📄 .gitignore                   # Git ignore rules
 │
-├── 📋 architecture.md             # Technical architecture and design
-├── 📋 roadmap.md                  # Development roadmap
+├── 📋 architecture.md              # Technical architecture and design
+├── 📋 roadmap.md                   # Development roadmap
 │
 ├── 📂 proyect-Python/
 │   └── modules/
-│       ├── testcase-generator/     # AI test case generation
-│       ├── script-generator/       # Automated script generation
+│       ├── testcase-generator/     # AI test case generation (LLM-based)
+│       ├── script-generator/       # Automated script generation (Playwright/Cypress)
 │       ├── log-analyzer/           # Log and error analysis
 │       ├── regression-optimizer/   # Regression suite optimization
-│       ├── rag-docs/              # RAG-based documentation
+│       ├── rag-docs/               # RAG-based documentation integration
 │       └── dashboard/              # Streamlit interactive dashboard
 │
 ├── 📂 docs/
@@ -60,7 +61,10 @@ AI-Assisted-QA-Toolkit/
 │
 └── 📂 whitepapers/
     └── whitepaper1.md             # Research and technical documentation
-```
+
+Notes:
+- The top-level `proyect-Python/` directory contains the working Python modules for the toolkit. The spelling "proyect" mirrors the existing folder name in the repository to avoid confusion; if you'd like it renamed to `project-Python/` or `project-python/`, I can open a PR to rename the folder and update references.
+- Each module is intentionally self-contained and includes its own README, examples, and unit tests where applicable.
 
 ---
 
