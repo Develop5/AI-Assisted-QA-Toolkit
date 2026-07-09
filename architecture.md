@@ -52,7 +52,7 @@ v
 
 ## 2.1 Multi‑RAG Architecture (Mermaid)
 
-# 📘 **Here is the Mermaid diagram formatted for architecture.md**
+### 📘 **Here is the Mermaid diagram formatted for architecture.md**
 
 ```mermaid
 
