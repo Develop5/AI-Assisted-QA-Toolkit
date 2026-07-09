@@ -1,7 +1,7 @@
 # 🎯 AI-Assisted-QA-Toolkit
 
 A practical, modular toolkit for integrating **Generative AI** into **Quality Assurance** workflows.  
-This repository is part of a professional transition from *QA Lead Automation* to *AI‑Assisted QA Lead*, showcasing real tools, frameworks, and examples that demonstrate how AI can enhance QA produc[...] 
+This repository is part of a professional transition from *QA Lead Automation* to *AI‑Assisted QA Lead*, showcasing real tools, frameworks, and examples that demonstrate how AI can enhance QA pro[...]
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -35,7 +35,7 @@ This repository is part of a professional transition from *QA Lead Automation* t
 
 Below is an updated, clearer view of the repository layout reflecting the current project organization. Paths are relative to the repository root.
 
-´´´text
+```text
 AI-Assisted-QA-Toolkit/
 │
 ├── 📄 README.md                    # This file
@@ -64,8 +64,9 @@ AI-Assisted-QA-Toolkit/
     └── whitepaper1.md             # Research and technical documentation
 
 Notes:
-- The top-level `proyect-Python/` directory contains the working Python modules for the toolkit. The spelling "proyect" mirrors the existing folder name in the repository to avoid confusion; if you'd like it renamed to `project-Python/` or `project-python/`, I can open a PR to rename the folder and update references.
+- The top-level `proyect-Python/` directory contains the working Python modules for the toolkit. The spelling "proyect" mirrors the existing folder name in the repository to avoid confusion; if yo[...]
 - Each module is intentionally self-contained and includes its own README, examples, and unit tests where applicable.
+```
 
 ---
 
@@ -76,7 +77,6 @@ Notes:
 - **[QA Standards](./docs/qa/test_case_standards.md)** - Testing best practices and guidelines
 - **[Whitepapers](./whitepapers/)** - Research and in-depth technical documentation
 
-´´´
 ---
 
 ## 🚀 Quick Start
