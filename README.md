@@ -35,6 +35,7 @@ This repository is part of a professional transition from *QA Lead Automation* t
 
 Below is an updated, clearer view of the repository layout reflecting the current project organization. Paths are relative to the repository root.
 
+´´´text
 AI-Assisted-QA-Toolkit/
 │
 ├── 📄 README.md                    # This file
@@ -75,6 +76,7 @@ Notes:
 - **[QA Standards](./docs/qa/test_case_standards.md)** - Testing best practices and guidelines
 - **[Whitepapers](./whitepapers/)** - Research and in-depth technical documentation
 
+´´´
 ---
 
 ## 🚀 Quick Start
