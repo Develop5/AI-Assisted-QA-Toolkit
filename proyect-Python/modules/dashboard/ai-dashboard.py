@@ -59,10 +59,10 @@ page = st.sidebar.radio(
         "Regression Optimizer",
         "QA Documentation RAG",
         "Security Documentation RAG",
-        "DevOps Documentation RAG"
+        "DevOps Documentation RAG",
+        "RAG Comparison Panel"
     ]
 )
-
 
 
 # -----------------------------
@@ -375,4 +375,111 @@ elif page == "DevOps Documentation RAG":
 
             except Exception as e:
                 st.error(f"Error running DevOps RAG engine: {e}")
+
+
+
+# -----------------------------
+# RAG Comparison Panel (QA / DevOps / Security)
+# -----------------------------
+
+elif page == "RAG Comparison Panel":
+    st.header("📊 RAG Comparison Panel — QA vs DevOps vs Security")
+
+    st.write(
+        "Ask a single question and compare how each RAG engine responds using its own dataset. "
+        "This is ideal for cross-domain analysis, debugging, and validating documentation coverage."
+    )
+
+    query = st.text_area(
+        "Enter your question:",
+        height=150,
+        placeholder="Example: What should be validated during an API deployment?"
+    )
+
+    col_docs = st.columns(3)
+
+    with col_docs[0]:
+        qa_docs_path = st.text_input(
+            "QA docs path:",
+            value="docs/qa/",
+            help="Folder containing QA documentation."
+        )
+
+    with col_docs[1]:
+        devops_docs_path = st.text_input(
+            "DevOps docs path:",
+            value="docs/devops/",
+            help="Folder containing DevOps documentation."
+        )
+
+    with col_docs[2]:
+        security_docs_path = st.text_input(
+            "Security docs path:",
+            value="docs/security/",
+            help="Folder containing Security documentation."
+        )
+
+    if st.button("Compare RAG Engines"):
+        if not query.strip():
+            st.error("Please enter a question.")
+        else:
+            try:
+                from modules.rag_docs.rag_docs import QARAGEngine
+
+                # Instantiate engines
+                qa_rag = QARAGEngine(docs_path=qa_docs_path)
+                devops_rag = QARAGEngine(docs_path=devops_docs_path)
+                security_rag = QARAGEngine(docs_path=security_docs_path)
+
+                # Run queries
+                qa_answer = qa_rag.answer(query)
+                devops_answer = devops_rag.answer(query)
+                security_answer = security_rag.answer(query)
+
+                qa_chunks = qa_rag.retrieve(query)
+                devops_chunks = devops_rag.retrieve(query)
+                security_chunks = security_rag.retrieve(query)
+
+                # Display results
+                st.subheader("📘 Answers Comparison")
+
+                col = st.columns(3)
+
+                with col[0]:
+                    st.markdown("### 🟦 QA RAG")
+                    st.write(qa_answer)
+
+                with col[1]:
+                    st.markdown("### 🟩 DevOps RAG")
+                    st.write(devops_answer)
+
+                with col[2]:
+                    st.markdown("### 🟥 Security RAG")
+                    st.write(security_answer)
+
+                st.subheader("📄 Retrieved Documentation Chunks")
+
+                col2 = st.columns(3)
+
+                with col2[0]:
+                    st.markdown("### 🟦 QA Docs")
+                    for chunk in qa_chunks:
+                        st.write(chunk)
+                        st.markdown("---")
+
+                with col2[1]:
+                    st.markdown("### 🟩 DevOps Docs")
+                    for chunk in devops_chunks:
+                        st.write(chunk)
+                        st.markdown("---")
+
+                with col2[2]:
+                    st.markdown("### 🟥 Security Docs")
+                    for chunk in security_chunks:
+                        st.write(chunk)
+                        st.markdown("---")
+
+            except Exception as e:
+                st.error(f"Error running RAG comparison: {e}")
+
 
