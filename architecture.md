@@ -55,25 +55,26 @@ v
 # 📘 **Here is the Mermaid diagram formatted for architecture.md**
 
 ```mermaid
+
 flowchart TD
 
-    subgraph User["🧑 User"]
+    subgraph User["User"]
         Q[Query]
     end
 
-    Q --> DSH["📊 Streamlit Dashboard"]
+    Q --> DSH["Streamlit Dashboard"]
 
-    subgraph RAG_Engines["🔍 Multi‑RAG Layer"]
-        QA_RAG["📘 QA RAG Engine"]
-        DEVOPS_RAG["⚙️ DevOps RAG Engine"]
-        SEC_RAG["🔐 Security RAG Engine"]
+    subgraph RAG_Engines["Multi-RAG Layer"]
+        QA_RAG["QA RAG Engine"]
+        DEVOPS_RAG["DevOps RAG Engine"]
+        SEC_RAG["Security RAG Engine"]
     end
 
     DSH --> QA_RAG
     DSH --> DEVOPS_RAG
     DSH --> SEC_RAG
 
-    subgraph QA_Docs["📁 QA Dataset"]
+    subgraph QA_Docs["QA Dataset"]
         QA1["test_case_standards.md"]
         QA2["automation_standards.md"]
         QA3["regression_governance.md"]
@@ -81,7 +82,7 @@ flowchart TD
         QA5["defect_lifecycle.md"]
     end
 
-    subgraph DevOps_Docs["📁 DevOps Dataset"]
+    subgraph DevOps_Docs["DevOps Dataset"]
         D1["ci_cd_standards.md"]
         D2["kubernetes_qos_standards.md"]
         D3["observability_standards.md"]
@@ -89,7 +90,7 @@ flowchart TD
         D5["incident_response_playbook.md"]
     end
 
-    subgraph Security_Docs["📁 Security Dataset"]
+    subgraph Security_Docs["Security Dataset"]
         S1["appsec_standards.md"]
         S2["devsecops_pipeline.md"]
         S3["api_security_standards.md"]
@@ -101,7 +102,7 @@ flowchart TD
     DEVOPS_RAG --> DevOps_Docs
     SEC_RAG --> Security_Docs
 
-    QA_RAG --> LLM["🧠 LLM"]
+    QA_RAG --> LLM["LLM"]
     DEVOPS_RAG --> LLM
     SEC_RAG --> LLM
 
@@ -109,9 +110,8 @@ flowchart TD
     DSH --> User
 
 
----
 
-## 3. Module Breakdown
+```## 3. Module Breakdown
 
 ### **3.1 Test Case Generator**
 - Input: raw requirements (text)
