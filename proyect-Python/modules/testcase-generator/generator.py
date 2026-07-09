@@ -9,8 +9,22 @@ structured test cases using an LLM backend.
 The design is intentionally simple and extensible so it can evolve
 into more advanced versions (RAG, domain fine-tuning, multi-model support).
 
-Author: AI-Assisted QA Lead (in transition)
+Extended Description
+--------------------
+This module performs the following functions:
+
+- It reads raw requirements provided as plain text.
+- It builds an optimized prompt designed to extract structured test cases.
+- It sends the prompt to an LLM backend (OpenAI) to generate the test cases.
+- It returns the test cases in structured JSON format.
+- It converts the JSON output into Python objects using the TestCase dataclass.
+- It includes an executable example demonstrating how the module works.
+- It is fully functional: if you have your OPENAI_API_KEY set in the environment,
+  you can run it immediately.
+
+Author: AI-Assisted QA Lead
 """
+
 
 import os
 from typing import List, Dict
