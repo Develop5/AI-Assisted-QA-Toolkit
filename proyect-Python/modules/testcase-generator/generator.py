@@ -1,41 +1,42 @@
 """
-AI-Assisted Test Case Generator
--------------------------------
+AI-Assisted Test Case Generator (with RAG Integration)
+------------------------------------------------------
 
 This module provides a functional implementation of an AI-powered
 test case generator. It takes raw requirements as input and produces
 structured test cases using an LLM backend.
 
-The design is intentionally simple and extensible so it can evolve
-into more advanced versions (RAG, domain fine-tuning, multi-model support).
+Now enhanced with RAG (Retrieval-Augmented Generation), the generator
+retrieves relevant QA documentation and injects it into the prompt,
+ensuring that generated test cases follow internal QA standards.
 
 Extended Description
 --------------------
 This module performs the following functions:
 
-- It reads raw requirements provided as plain text.
-- It builds an optimized prompt designed to extract structured test cases.
-- It sends the prompt to an LLM backend (OpenAI) to generate the test cases.
-- It returns the test cases in structured JSON format.
-- It converts the JSON output into Python objects using the TestCase dataclass.
-- It includes an executable example demonstrating how the module works.
-- It is fully functional: if you have your OPENAI_API_KEY set in the environment,
-  you can run it immediately.
+- Reads raw requirements provided as plain text.
+- Retrieves relevant QA documentation using the RAG engine.
+- Builds an optimized prompt combining requirements + documentation.
+- Sends the prompt to an LLM backend (OpenAI) to generate structured test cases.
+- Returns test cases in JSON format.
+- Converts JSON output into Python objects using the TestCase dataclass.
+- Includes an executable example.
+- Fully functional: requires OPENAI_API_KEY.
 
-Author: AI-Assisted QA Lead
+Author: AI-Assisted QA Lead (in transition)
 """
 
-
 import os
-from typing import List, Dict
+from typing import List
 from dataclasses import dataclass
 
 try:
     from openai import OpenAI
 except ImportError:
-    raise ImportError(
-        "The 'openai' package is required. Install it with: pip install openai"
-    )
+    raise ImportError("Install with: pip install openai")
+
+# Import RAG engine
+from modules.rag_docs.rag_docs import QARAGEngine
 
 
 # -----------------------------
@@ -55,12 +56,6 @@ class TestCase:
 # -----------------------------
 
 class LLMClient:
-    """
-    Wrapper around the OpenAI client to keep the module decoupled
-    from the underlying provider. This allows future replacement
-    with Azure OpenAI or local models.
-    """
-
     def __init__(self, model: str = "gpt-4o-mini"):
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
@@ -79,26 +74,42 @@ class LLMClient:
 
 
 # -----------------------------
-# Test Case Generator
+# Test Case Generator (with RAG)
 # -----------------------------
 
 class TestCaseGenerator:
     """
-    Generates structured test cases from raw requirements using an LLM.
+    Generates structured test cases from raw requirements using an LLM,
+    enhanced with RAG-based QA documentation retrieval.
     """
 
-    def __init__(self, model: str = "gpt-4o-mini"):
+    def __init__(self, model: str = "gpt-4o-mini", docs_path: str = "docs/qa/"):
         self.llm = LLMClient(model=model)
+        self.rag = QARAGEngine(docs_path=docs_path)
 
     def generate_testcases(self, requirements: str) -> List[TestCase]:
-        prompt = self._build_prompt(requirements)
+        # Retrieve relevant QA documentation
+        retrieved_docs = self.rag.retrieve(requirements)
+
+        # Build prompt with documentation context
+        prompt = self._build_prompt(requirements, retrieved_docs)
+
         raw_output = self.llm.generate(prompt)
         return self._parse_output(raw_output)
 
-    def _build_prompt(self, requirements: str) -> str:
+    def _build_prompt(self, requirements: str, docs: List[str]) -> str:
+        docs_context = "\n\n".join(docs)
+
         return f"""
-You are an expert QA engineer. Convert the following requirements into
-structured test cases. Use the following JSON format:
+You are an expert QA engineer. Use the following QA documentation to guide your test case creation:
+
+--- QA Documentation Context ---
+{docs_context}
+--------------------------------
+
+Convert the following requirements into structured test cases.
+
+Use this JSON format:
 
 [
   {{
@@ -139,11 +150,10 @@ Requirements:
 # -----------------------------
 
 if __name__ == "__main__":
-    generator = TestCaseGenerator()
+    generator = TestCaseGenerator(docs_path="docs/qa/")
 
     requirements_text = """
-    Users must be able to log in using email and password.
-    If credentials are invalid, an error message must be displayed.
+    Users must be able to reset their password using email verification.
     """
 
     testcases = generator.generate_testcases(requirements_text)
